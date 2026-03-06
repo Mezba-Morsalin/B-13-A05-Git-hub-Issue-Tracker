@@ -1,0 +1,49 @@
+* {
+    font-family: "Geist", sans-serif;
+}
+
+body{
+    background: #F8FAFC;
+}
+/* <section class="bg-white lg:w-[580px] mx-auto h-screen shadow-xl">
+        <div class="text-center pt-16">
+            <img class="mx-auto mb-5" src="./assets/github-logo.png" alt="">
+            <h2 class="text-2xl font-semibold text-[#1F2937] mb-1">GitHub Issues Tracker</h2>
+            <p class="text-base leading-6 text-[#64748B]">Sign in to manage your issues</p>
+        </div>
+        <fieldset class="fieldset bg-white border-base-300 rounded-box w-xs border p-4 mx-auto mt-10">
+
+        <label class="label text-base text-[#1F2937]">Username</label>
+        <input id="username" type="text" class="input outline-none border-[1px] border-t-slate-400" placeholder="Enter Username" />
+
+        <label class="label text-base text-[#1F2937]">Password</label>
+        <input id="password" type="password" class="input border-[1px] border-t-slate-400 outline-none " placeholder="Password" />
+
+        <button id="login-btn" class="btn btn-primary mt-4">Login</button>
+        </fieldset>
+        <div class="space-y-6">
+            <p class="text-base text-center leading-6 text-[#64748B] mt-5">OR</p>
+            <p class="text-base text-center leading-6 text-[#64748B]">Demo Credentials:</p>
+            <div class="card bg-base-300 w-96 shadow-sm mx-auto">
+  <div class="card-body text-center">
+    <h2 class=""><span class="font-semibold text-[#1F2937]">Username : </span>admin</h2>
+    <h2 ><span class="font-semibold text-[#1F2937]">Password : </span>admin123</h2>
+  </div>
+</div>
+        </div>
+    </section> */
+/* 
+    // document.getElementById("login-btn").addEventListener("click", () => {
+//     const userName = document.getElementById("username");
+//     const passwordField = document.getElementById("password")
+//     const userNameValue = userName.value;
+//     const passwordFieldBValue = passwordField.value;
+
+//     if (userNameValue === "admin" && passwordFieldBValue === "admin123") {
+//         alert("Login Successful");
+//         window.location.href = "dashboard.html";
+//     }
+//     else {
+//         alert("Enter a Valid Username or Password")
+//     }
+// }) */
