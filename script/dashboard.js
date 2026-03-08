@@ -19,7 +19,7 @@ const displayAllCards = (cards) => {
     cards.forEach(card => {
         let borderClass = "border-green-600";
 
-        if(card.priority === "low"){
+        if(card.status === "closed"){
             borderClass = "border-purple-600";
         }
         let priorityClass = "";
@@ -33,13 +33,13 @@ const displayAllCards = (cards) => {
         }
         const labelsHTML = card.labels.map(label => {
 
-            let labelClass = "bg-green-100 text-green-500 text-[18px] p-4";
+            let labelClass = "bg-green-100 text-green-500 border border-green-500 text-[18px] p-4";
 
             if(label === "bug"){
-                labelClass = "bg-red-100 text-red-500 text-[18px] p-4";
+                labelClass = "bg-red-100 text-red-500 border border-red-500 text-[18px] p-4";
             }
             else if(label === "help wanted"){
-                labelClass = "bg-yellow-100 text-orange-400 text-[18px] p-4";
+                labelClass = "bg-yellow-100 text-orange-400 text-[18px] p-4 border border-orange-400";
             }
 
             return `
@@ -50,7 +50,7 @@ const displayAllCards = (cards) => {
         const newElement = document.createElement("div");
 
         newElement.innerHTML = `
-        <div class="issue-cards bg-white p-4 shadow rounded-xl space-y-4 h-full border-t-4 border-green-600 ${borderClass}">
+        <div onclick="showCardModal(${card.id})" class="issue-cards bg-white p-4 shadow rounded-xl space-y-4 h-full border-t-4 border-green-600 ${borderClass}">
         <div class="flex justify-between items-center">
           <div>
             <img src="./assets/Open-Status.png" alt="">
@@ -79,7 +79,7 @@ const showAll = () => {
 
 const showOpen = () => {
     const openIssues = allIssues.filter(issue => 
-        issue.priority === "high" || issue.priority === "medium"
+        issue.status === "open"
     );
     issueCount.innerText = `${openIssues.length} Issues`;
     displayAllCards(openIssues);
@@ -88,14 +88,14 @@ const showOpen = () => {
 
 const showClosed = () => {
     const closedIssues = allIssues.filter(issue => 
-        issue.priority === "low"
+        issue.status === "closed"
     );
     issueCount.innerText = `${closedIssues.length} Issues`;
     displayAllCards(closedIssues);
     ActiveButton('closed');
 }
 
-// Function to set active btn
+// Function set active btn
 const ActiveButton = (activeBtn) => {
 
     const buttons = document.querySelectorAll("#btn-container button");
@@ -131,6 +131,86 @@ const ActiveButton = (activeBtn) => {
 
 }
 
+const showCardModal = (id) => {
+    fetch(`https://phi-lab-server.vercel.app/api/v1/lab/issue/${id}`)
+    .then(response => response.json())
+    .then(data => {
+        displayCardModal(data.data)
+    })
+}
+
+const displayCardModal = (modals) => {
+
+    const modalContainer = document.getElementById("modal-container");
+
+    let priorityClass = "";
+
+    if (modals.priority === "high") {
+        priorityClass = "bg-red-100 text-red-500 border border-red-500";
+    } 
+    else if (modals.priority === "medium") {
+        priorityClass = "bg-orange-100 text-orange-400 border border-orange-400";
+    } 
+    else if (modals.priority === "low") {
+        priorityClass = "bg-green-100 text-green-500 border border-green-500";
+    }
+
+    const labelsHTML = modals.labels.map(label => {
+
+        let labelClass = "bg-green-100 text-green-500 border border-green-500";
+
+        if(label === "bug"){
+            labelClass = "bg-red-100 text-red-500 border border-red-500";
+        }
+        else if(label === "help wanted"){
+            labelClass = "bg-yellow-100 text-orange-400 border border-orange-400";
+        }
+
+        return `
+        <button class="${labelClass} rounded-full px-3 py-1 text-sm">${label}</button>
+        `
+    }).join("");
+
+    let statusClass = "";
+
+    if (modals.status === "open") {
+        statusClass = "text-green-500";
+    } 
+    else if (modals.status === "closed") {
+        statusClass = "text-purple-500";
+    }
+
+    modalContainer.innerHTML = `
+    <div class="p-4 rounded space-y-3">
+        <h3 class="text-2xl font-bold text-[#1F2937]">${modals.title}</h3>
+        <ul class="flex gap-8 items-center">
+            <li class="bg-base-300 ${statusClass} rounded-full list-none px-3">${modals.status}</li>
+            <li class="text-[#64748B] text-[14px]">${modals.author}</li>
+            <li class="text-[#64748B] text-[14px]">22/02/2026</li>
+        </ul>
+        <div class="flex gap-4 py-2">${labelsHTML}
+        </div>
+        <p class="py-4 text-[#64748B]">${modals.description}</p>
+        <div class="flex gap-40 items-center bg-base-300 rounded-xl p-4">
+            <div class="space-y-2">
+                <p class="text-[#64748B]">Assignee:</p>
+                <h4 class="text-base font-semibold text-[#1F2937]">${modals.author}</h4>
+            </div>
+            <div class="space-y-2">
+                <p class="text-[#64748B]">Priority:</p>
+                <p class="${priorityClass} py-1 px-3 rounded-full text-sm font-semibold">${modals.priority}</p>
+            </div>
+        </div>
+        <div class="modal-action">
+            <form method="dialog">
+                <button class="btn btn-primary">Close</button>
+            </form>
+        </div>
+    </div>
+    `
+
+    document.getElementById("card_modal").showModal();
+}
 allCards();
 
 document.getElementById("log-out").addEventListener("click", () => {
