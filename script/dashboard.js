@@ -12,87 +12,129 @@ const allCards = () => {
         displayAllCards(allIssues);
     })
 }
+// Loading Spin
+const addSpin = (spins) => {
+    const spin = document.getElementById("spin");
+    const cardContainer = document.getElementById("card-container");
 
-const displayAllCards = (cards) => {
-    cardContainer.innerHTML = "";
-
-    cards.forEach(card => {
-        let borderClass = "border-green-600";
-
-        if(card.status === "closed"){
-            borderClass = "border-purple-600";
-        }
-        let priorityClass = "";
-
-        if (card.priority === "high") {
-            priorityClass = "bg-base-300 text-red-500 text-[18px] font-semibold";
-        } else if (card.priority === "medium") {
-            priorityClass = "bg-base-300 text-orange-400 text-[18px] font-semibold";
-        } else if (card.priority === "low") {
-            priorityClass = "bg-base-300 text-green-500 text-[18px font-semibold";
-        }
-        const labelsHTML = card.labels.map(label => {
-
-            let labelClass = "bg-green-100 text-green-500 border border-green-500 text-[18px] p-4";
-
-            if(label === "bug"){
-                labelClass = "bg-red-100 text-red-500 border border-red-500 text-[18px] p-4";
-            }
-            else if(label === "help wanted"){
-                labelClass = "bg-yellow-100 text-orange-400 text-[18px] p-4 border border-orange-400";
-            }
-
-            return `
-            <button class="${labelClass} rounded-full px-3 py-1 text-sm">${label}</button>
-            `
-        }).join("")
-
-        const newElement = document.createElement("div");
-
-        newElement.innerHTML = `
-        <div onclick="showCardModal(${card.id})" class="issue-cards bg-white p-4 shadow rounded-xl space-y-4 h-full border-t-4 border-green-600 ${borderClass}">
-        <div class="flex justify-between items-center">
-          <div>
-            <img src="./assets/Open-Status.png" alt="">
-          </div>
-          <div>
-              <p class="${priorityClass} rounded-full w-24 text-center">${card.priority}</p>
-          </div>
-        </div>
-        <h3 class="text-xl font-semibold text-[#1F2937]">${card.title}</h3>
-        <p class="text-base leading-6 text-[#64748B] line-clamp-2">${card.description}</p>
-        <div class="flex gap-2 flex-wrap">${labelsHTML}</div>
-        <p class="text-base leading-6 text-[#64748B]">${card.assignee}</p>
-        <p class="text-base leading-6 text-[#64748B]">${new Date(card.createdAt).toLocaleString("en-US")}</p>
-        </div>
-        `
-        cardContainer.append(newElement)
-
-    })
+    if (spins) {
+        spin.classList.remove("hidden");
+        cardContainer.classList.add("hidden");
+    } 
+    else {
+        spin.classList.add("hidden");
+        cardContainer.classList.remove("hidden");
+    }
 }
 
+const displayAllCards = (cards) => {
+
+    const cardContainer = document.getElementById("card-container");
+
+    cardContainer.innerHTML = "";
+
+    addSpin(true);
+
+    setTimeout(() => {
+
+        cards.forEach(card => {
+
+            let borderClass = "border-green-600";
+            if(card.status === "closed"){
+                borderClass = "border-purple-600";
+            }
+
+            let priorityClass = "";
+
+            if (card.priority === "high") {
+                priorityClass = "bg-base-300 text-red-500 text-[18px] font-semibold";
+            } 
+            else if (card.priority === "medium") {
+                priorityClass = "bg-base-300 text-orange-400 text-[18px] font-semibold";
+            } 
+            else if (card.priority === "low") {
+                priorityClass = "bg-base-300 text-green-500 text-[18px] font-semibold";
+            }
+
+            const labelsHTML = card.labels.map(label => {
+
+                let labelClass = "bg-green-100 text-green-500 border border-green-500 text-[18px] p-4";
+
+                if(label === "bug"){
+                    labelClass = "bg-red-100 text-red-500 border border-red-500 text-[18px] p-4";
+                }
+                else if(label === "help wanted"){
+                    labelClass = "bg-yellow-100 text-orange-400 text-[18px] p-4 border border-orange-400";
+                }
+
+                return `
+                <button class="${labelClass} rounded-full px-3 py-1 text-sm">${label}</button>
+                `
+            }).join("")
+
+            const newElement = document.createElement("div");
+
+            newElement.innerHTML = `
+            <div onclick="showCardModal(${card.id})"
+            class="issue-cards bg-white p-4 shadow rounded-xl space-y-4 h-full border-t-4 ${borderClass}">
+            <div class="flex justify-between items-center">
+                <img src="./assets/Open-Status.png" alt="">
+                <p class="${priorityClass} rounded-full w-24 text-center">${card.priority}</p>
+            </div>
+            <h3 class="text-xl font-semibold text-[#1F2937]">${card.title}</h3>
+            <p class="text-base leading-6 text-[#64748B] line-clamp-2">${card.description}</p>
+            <div class="flex gap-2 flex-wrap">${labelsHTML}
+            </div>
+            <p class="text-base leading-6 text-[#64748B]">${card.assignee}</p>
+            <p class="text-base leading-6 text-[#64748B]">${new Date(card.createdAt).toLocaleString("en-US")}</p>
+            </div>
+            `
+            cardContainer.append(newElement)
+
+        })
+
+        addSpin(false)
+
+    },400)
+}
+
+document.getElementById("search-issue-btn").addEventListener("click", () => {
+
+    const input = document.getElementById("search-input-issue");
+    const searchValue = input.value.trim().toLowerCase();
+
+    fetch("https://phi-lab-server.vercel.app/api/v1/lab/issues")
+    .then(response => response.json())
+    .then(data => {
+        const allIssues = data.data;
+        const filteredIssues = allIssues.filter(issue =>
+            issue.title.toLowerCase().includes(searchValue)
+        );
+        displayAllCards(filteredIssues)
+    })
+})
+
 const showAll = () => {
-    issueCount.innerText = `${allIssues.length} Issues`;
-    displayAllCards(allIssues);
-    ActiveButton('all');
+    const allLength = allIssues.length
+    issueCount.innerText = allLength + " Issues"
+    displayAllCards(allIssues)
+    ActiveButton('all')
 }
 
 const showOpen = () => {
-    const openIssues = allIssues.filter(issue => 
-        issue.status === "open"
-    );
-    issueCount.innerText = `${openIssues.length} Issues`;
-    displayAllCards(openIssues);
-    ActiveButton('open');
+    const openIssues = allIssues.filter(issue => issue.status === "open")
+    const openLength = openIssues.length
+    issueCount.innerText = openLength + " Issues"
+    displayAllCards(openIssues)
+    ActiveButton('open')
 }
 
 const showClosed = () => {
-    const closedIssues = allIssues.filter(issue => 
-        issue.status === "closed"
-    );
-    issueCount.innerText = `${closedIssues.length} Issues`;
-    displayAllCards(closedIssues);
-    ActiveButton('closed');
+    const closedIssues = allIssues.filter(issue => issue.status === "closed")
+    const closedLength = closedIssues.length
+    issueCount.innerText = closedLength + " Issues"
+    displayAllCards(closedIssues)
+    ActiveButton('closed')
 }
 
 // Function set active btn
@@ -131,6 +173,7 @@ const ActiveButton = (activeBtn) => {
 
 }
 
+// Modal
 const showCardModal = (id) => {
     fetch(`https://phi-lab-server.vercel.app/api/v1/lab/issue/${id}`)
     .then(response => response.json())
@@ -138,7 +181,6 @@ const showCardModal = (id) => {
         displayCardModal(data.data)
     })
 }
-
 const displayCardModal = (modals) => {
 
     const modalContainer = document.getElementById("modal-container");
@@ -186,7 +228,7 @@ const displayCardModal = (modals) => {
         <ul class="flex gap-8 items-center">
             <li class="bg-base-300 ${statusClass} rounded-full list-none px-3">${modals.status}</li>
             <li class="text-[#64748B] text-[14px]">${modals.author}</li>
-            <li class="text-[#64748B] text-[14px]">22/02/2026</li>
+            <li class="text-[#64748B] text-[14px]">${new Date(modals.updatedAt).toLocaleString("en-US")}</li>
         </ul>
         <div class="flex gap-4 py-2">${labelsHTML}
         </div>
