@@ -254,7 +254,3 @@ const displayCardModal = (modals) => {
     document.getElementById("card_modal").showModal();
 }
 allCards();
-
-document.getElementById("log-out").addEventListener("click", () => {
-    window.location.href ="index.html"
-})
